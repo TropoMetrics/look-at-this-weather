@@ -1,15 +1,24 @@
 import { Card } from "@/components/ui/card";
 import { Cloud, CloudRain, CloudSun, Sun } from "lucide-react";
+import { WeatherData, getWeatherIcon } from "@/lib/weatherApi";
 
-const WeeklyForecast = () => {
-  const days = [
-    { date: "28", day: "Today", icon: CloudRain, high: "13°", low: "10°" },
-    { date: "29", day: "Wed", icon: CloudRain, high: "13°", low: "10°" },
-    { date: "30", day: "Thu", icon: CloudSun, high: "13°", low: "8°" },
-    { date: "31", day: "Fri", icon: Cloud, high: "14°", low: "13°" },
-    { date: "1", day: "Sat", icon: CloudRain, high: "15°", low: "10°" },
-    { date: "2", day: "Sun", icon: Sun, high: "11°", low: "10°" },
-  ];
+interface WeeklyForecastProps {
+  data: WeatherData;
+}
+
+const WeeklyForecast = ({ data }: WeeklyForecastProps) => {
+  const days = data.daily.map((day, index) => {
+    const date = new Date(day.date);
+    const iconType = getWeatherIcon(day.weatherCode);
+    return {
+      date: date.getDate().toString(),
+      day: index === 0 ? "Today" : date.toLocaleDateString('en-US', { weekday: 'short' }),
+      icon: iconType === 'sun' ? Sun : iconType === 'cloudRain' ? CloudRain : iconType === 'cloudSun' ? CloudSun : Cloud,
+      iconColor: iconType === 'sun' ? 'text-warning' : iconType === 'cloudRain' ? 'text-primary' : 'text-foreground',
+      high: `${day.temperatureMax}°`,
+      low: `${day.temperatureMin}°`,
+    };
+  });
 
   return (
     <div className="flex gap-4 overflow-x-auto pb-2">
@@ -25,7 +34,7 @@ const WeeklyForecast = () => {
                 <div className="text-2xl font-semibold">{day.date}</div>
                 <div className="text-xs text-muted-foreground">{day.day}</div>
               </div>
-              <IconComponent className="w-12 h-12 text-primary" />
+              <IconComponent className={`w-12 h-12 ${day.iconColor}`} />
               <div className="flex gap-2 text-sm">
                 <span className="font-medium">{day.high}</span>
                 <span className="text-muted-foreground">{day.low}</span>

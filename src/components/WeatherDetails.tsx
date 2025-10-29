@@ -1,7 +1,20 @@
 import { Card } from "@/components/ui/card";
 import { Wind, Droplets, Eye, Gauge, Moon, Sun } from "lucide-react";
+import { WeatherData } from "@/lib/weatherApi";
 
-const WeatherDetails = () => {
+interface WeatherDetailsProps {
+  data: WeatherData;
+}
+
+const WeatherDetails = ({ data }: WeatherDetailsProps) => {
+  const getUVLevel = (uv: number) => {
+    if (uv < 3) return { level: "Low", color: "text-success" };
+    if (uv < 6) return { level: "Moderate", color: "text-warning" };
+    if (uv < 8) return { level: "High", color: "text-accent" };
+    return { level: "Very High", color: "text-destructive" };
+  };
+
+  const uvInfo = getUVLevel(data.current.uvIndex);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <Card className="p-6 bg-card border-border">
@@ -10,10 +23,13 @@ const WeatherDetails = () => {
         </div>
         <div className="space-y-2">
           <div className="h-2 bg-gradient-to-r from-primary to-accent rounded-full relative">
-            <div className="absolute -right-1 -top-1 w-4 h-4 bg-primary rounded-full border-2 border-background" />
+            <div 
+              className="absolute -top-1 w-4 h-4 bg-primary rounded-full border-2 border-background transition-all"
+              style={{ left: `${(data.current.temperature + 10) * 2}%` }}
+            />
           </div>
-          <div className="text-4xl font-light">12°</div>
-          <p className="text-xs text-muted-foreground">Steady ☀️</p>
+          <div className="text-4xl font-light">{data.current.temperature}°</div>
+          <p className="text-xs text-muted-foreground">Current temperature</p>
         </div>
       </Card>
 
@@ -23,10 +39,13 @@ const WeatherDetails = () => {
         </div>
         <div className="space-y-2">
           <div className="h-2 bg-gradient-to-r from-accent to-primary rounded-full relative">
-            <div className="absolute left-1/4 -top-1 w-4 h-4 bg-accent rounded-full border-2 border-background" />
+            <div 
+              className="absolute -top-1 w-4 h-4 bg-accent rounded-full border-2 border-background transition-all"
+              style={{ left: `${(data.current.feelsLike + 10) * 2}%` }}
+            />
           </div>
-          <div className="text-4xl font-light">3°</div>
-          <p className="text-xs text-muted-foreground">Chilly ❄️</p>
+          <div className="text-4xl font-light">{data.current.feelsLike}°</div>
+          <p className="text-xs text-muted-foreground">Apparent temperature</p>
         </div>
       </Card>
 
@@ -39,15 +58,26 @@ const WeatherDetails = () => {
           <div className="relative w-24 h-24">
             <div className="absolute inset-0 rounded-full border-4 border-secondary" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-12 h-12 bg-success/20 rounded-full flex items-center justify-center rotate-45">
-                <div className="w-1 h-6 bg-success rounded-full" />
+              <div 
+                className="w-12 h-12 bg-success/20 rounded-full flex items-center justify-center transition-transform"
+                style={{ transform: `rotate(${data.current.windDirection}deg)` }}
+              >
+                <div className="relative w-1 h-8 bg-success rounded-full">
+                  <div 
+                    className="absolute -top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-b-[6px] border-b-success"
+                  />
+                </div>
               </div>
             </div>
+            <div className="absolute -top-2 left-1/2 -translate-x-1/2 text-xs font-medium">N</div>
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs text-muted-foreground">S</div>
+            <div className="absolute top-1/2 -left-2 -translate-y-1/2 text-xs text-muted-foreground">W</div>
+            <div className="absolute top-1/2 -right-2 -translate-y-1/2 text-xs text-muted-foreground">E</div>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-light">26</div>
+            <div className="text-3xl font-light">{data.current.windSpeed}</div>
             <div className="text-xs text-muted-foreground">km/h</div>
-            <div className="text-2xl font-light mt-2">45</div>
+            <div className="text-2xl font-light mt-2">{data.current.windGusts}</div>
             <div className="text-xs text-muted-foreground">Wind Gust</div>
           </div>
         </div>
@@ -68,10 +98,10 @@ const WeatherDetails = () => {
               />
             ))}
           </div>
-          <div className="text-4xl font-light">71%</div>
+          <div className="text-4xl font-light">{data.current.humidity}%</div>
           <div className="text-sm">
             <span className="text-muted-foreground">Dew point: </span>
-            <span className="text-foreground">7°</span>
+            <span className="text-foreground">{data.current.dewPoint}°</span>
           </div>
         </div>
       </Card>
@@ -100,7 +130,7 @@ const WeatherDetails = () => {
                 stroke="url(#gradient)"
                 strokeWidth="8"
                 fill="none"
-                strokeDasharray={`${(1 / 11) * 339} 339`}
+                strokeDasharray={`${(data.current.uvIndex / 11) * 339} 339`}
                 strokeLinecap="round"
                 className="transition-all duration-500"
               />
@@ -113,11 +143,11 @@ const WeatherDetails = () => {
               </defs>
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-4xl font-light">1</div>
+              <div className="text-4xl font-light">{data.current.uvIndex.toFixed(1)}</div>
             </div>
           </div>
         </div>
-        <p className="text-xs text-center text-success mt-2">Low ✓</p>
+        <p className={`text-xs text-center ${uvInfo.color} mt-2`}>{uvInfo.level} ✓</p>
       </Card>
 
       <Card className="p-6 bg-card border-border">
@@ -144,16 +174,18 @@ const WeatherDetails = () => {
                 stroke="hsl(var(--success))"
                 strokeWidth="8"
                 fill="none"
-                strokeDasharray={`${(29 / 100) * 339} 339`}
+                strokeDasharray={`${(Math.min(data.current.humidity, 100) / 100) * 339} 339`}
                 strokeLinecap="round"
               />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-4xl font-light">29</div>
+              <div className="text-4xl font-light">{data.current.humidity}</div>
             </div>
           </div>
         </div>
-        <p className="text-xs text-center text-success mt-2">Good ✓</p>
+        <p className="text-xs text-center text-success mt-2">
+          {data.current.humidity < 50 ? "Good" : data.current.humidity < 70 ? "Moderate" : "High"} ✓
+        </p>
       </Card>
 
       <Card className="p-6 bg-card border-border">
@@ -169,8 +201,10 @@ const WeatherDetails = () => {
               style={{ width: `${100 - i * 10}%` }}
             />
           ))}
-          <div className="text-4xl font-light">44.2 <span className="text-xl text-muted-foreground">km</span></div>
-          <p className="text-xs text-success">Excellent ✓</p>
+          <div className="text-4xl font-light">{data.current.visibility} <span className="text-xl text-muted-foreground">km</span></div>
+          <p className="text-xs text-success">
+            {data.current.visibility > 40 ? "Excellent" : data.current.visibility > 20 ? "Good" : "Poor"} ✓
+          </p>
         </div>
       </Card>
 
@@ -181,10 +215,15 @@ const WeatherDetails = () => {
         </div>
         <div className="space-y-3">
           <div className="relative h-2 bg-secondary rounded-full">
-            <div className="absolute left-3/4 -top-1 w-4 h-4 bg-primary rounded-full border-2 border-background" />
+            <div 
+              className="absolute -top-1 w-4 h-4 bg-primary rounded-full border-2 border-background transition-all"
+              style={{ left: `${((data.current.pressure - 950) / 100) * 100}%` }}
+            />
           </div>
-          <div className="text-4xl font-light">1006 <span className="text-xl text-muted-foreground">mb</span></div>
-          <p className="text-xs text-muted-foreground">Rising slowly 🔼</p>
+          <div className="text-4xl font-light">{data.current.pressure} <span className="text-xl text-muted-foreground">mb</span></div>
+          <p className="text-xs text-muted-foreground">
+            {data.current.pressure > 1013 ? "High pressure" : "Low pressure"}
+          </p>
         </div>
       </Card>
 

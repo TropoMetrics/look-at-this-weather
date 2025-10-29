@@ -1,21 +1,23 @@
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Cloud, CloudRain } from "lucide-react";
+import { Cloud, CloudRain, CloudSun, Sun } from "lucide-react";
+import { WeatherData, getWeatherIcon } from "@/lib/weatherApi";
 
-const HourlyForecast = () => {
-  const hours = [
-    { time: "2 AM", temp: "12°", icon: CloudRain },
-    { time: "4 AM", temp: "12°", icon: CloudRain },
-    { time: "6 AM", temp: "12°", icon: CloudRain },
-    { time: "8 AM", temp: "12°", icon: Cloud },
-    { time: "10 AM", temp: "12°", icon: Cloud },
-    { time: "12 PM", temp: "13°", icon: Cloud },
-    { time: "2 PM", temp: "13°", icon: Cloud },
-    { time: "4 PM", temp: "13°", icon: Cloud },
-    { time: "6 PM", temp: "12°", icon: CloudRain },
-    { time: "8 PM", temp: "12°", icon: CloudRain },
-    { time: "10 PM", temp: "11°", icon: CloudRain },
-  ];
+interface HourlyForecastProps {
+  data: WeatherData;
+}
+
+const HourlyForecast = ({ data }: HourlyForecastProps) => {
+  const hours = data.hourly.map((hour) => {
+    const iconType = getWeatherIcon(hour.weatherCode);
+    return {
+      time: hour.time,
+      temp: `${hour.temperature}°`,
+      icon: iconType === 'sun' ? Sun : iconType === 'cloudRain' ? CloudRain : iconType === 'cloudSun' ? CloudSun : Cloud,
+      iconColor: iconType === 'sun' ? 'text-warning' : iconType === 'cloudRain' ? 'text-primary' : 'text-foreground',
+      precipitation: hour.precipitation,
+    };
+  });
 
   return (
     <Card className="p-6 bg-card border-border">
@@ -41,12 +43,12 @@ const HourlyForecast = () => {
                     className="flex flex-col items-center gap-2 min-w-[80px] p-3 rounded-lg hover:bg-secondary/50 transition-colors"
                   >
                     <span className="text-sm text-muted-foreground">{hour.time}</span>
-                    <IconComponent className="w-8 h-8 text-primary" />
+                    <IconComponent className={`w-8 h-8 ${hour.iconColor}`} />
                     <span className="text-sm font-medium">{hour.temp}</span>
                     <div className="w-full bg-primary/20 rounded-full h-1 mt-2">
                       <div
                         className="bg-primary rounded-full h-1"
-                        style={{ width: `${Math.random() * 100}%` }}
+                        style={{ width: `${hour.precipitation}%` }}
                       />
                     </div>
                   </div>
