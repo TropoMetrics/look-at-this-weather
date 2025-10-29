@@ -1,4 +1,4 @@
-import { Cloud, Sun, CloudRain, CloudSun, Wind, Droplets, Eye, Gauge, Thermometer } from "lucide-react";
+import { Cloud, Sun, CloudRain, CloudSun, Wind, Droplets, Eye, Gauge, Thermometer, Sunrise, Sunset } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { WeatherData, getWeatherDescription, getWeatherIcon } from "@/lib/weatherApi";
 
@@ -11,6 +11,9 @@ const CurrentWeather = ({ data }: CurrentWeatherProps) => {
   const WeatherIcon = iconType === 'sun' ? Sun : iconType === 'cloudRain' ? CloudRain : iconType === 'cloudSun' ? CloudSun : Cloud;
   const iconColor = iconType === 'sun' ? 'text-warning' : iconType === 'cloudRain' ? 'text-primary' : 'text-foreground';
   const description = getWeatherDescription(data.current.weatherCode);
+  
+  const sunrise = new Date(data.daily[0].sunrise).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  const sunset = new Date(data.daily[0].sunset).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row gap-6">
@@ -30,6 +33,22 @@ const CurrentWeather = ({ data }: CurrentWeatherProps) => {
               <p className="text-sm text-muted-foreground mt-4">
                 Cloud cover at {data.current.cloudCover}%. Wind speed {data.current.windSpeed} km/h.
               </p>
+              <div className="flex items-center gap-4 mt-4 pt-4 border-t border-border">
+                <div className="flex items-center gap-2">
+                  <Sunrise className="w-5 h-5 text-warning" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Sunrise</p>
+                    <p className="text-sm font-medium">{sunrise}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Sunset className="w-5 h-5 text-accent" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Sunset</p>
+                    <p className="text-sm font-medium">{sunset}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </Card>

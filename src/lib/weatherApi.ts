@@ -18,18 +18,24 @@ export interface WeatherData {
     temperature: number;
     weatherCode: number;
     precipitation: number;
+    windSpeed: number;
+    windDirection: number;
+    windGusts: number;
+    humidity: number;
   }>;
   daily: Array<{
     date: string;
     temperatureMax: number;
     temperatureMin: number;
     weatherCode: number;
+    sunrise: string;
+    sunset: string;
   }>;
 }
 
 export async function fetchWeatherData(latitude: number, longitude: number): Promise<WeatherData> {
   const response = await fetch(
-    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=7`
+    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,wind_direction_10m,wind_gusts_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto&forecast_days=7`
   );
   
   const data = await response.json();
@@ -62,12 +68,18 @@ export async function fetchWeatherData(latitude: number, longitude: number): Pro
       temperature: Math.round(data.hourly.temperature_2m[index]),
       weatherCode: data.hourly.weather_code[index],
       precipitation: data.hourly.precipitation_probability[index] || 0,
+      windSpeed: Math.round(data.hourly.wind_speed_10m[index]),
+      windDirection: data.hourly.wind_direction_10m[index],
+      windGusts: Math.round(data.hourly.wind_gusts_10m[index]),
+      humidity: data.hourly.relative_humidity_2m[index],
     })),
     daily: data.daily.time.slice(0, 7).map((date: string, index: number) => ({
       date: date,
       temperatureMax: Math.round(data.daily.temperature_2m_max[index]),
       temperatureMin: Math.round(data.daily.temperature_2m_min[index]),
       weatherCode: data.daily.weather_code[index],
+      sunrise: data.daily.sunrise[index],
+      sunset: data.daily.sunset[index],
     })),
   };
 }
