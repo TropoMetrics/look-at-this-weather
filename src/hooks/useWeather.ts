@@ -3,7 +3,11 @@ import { fetchWeatherData, WeatherData } from "@/lib/weatherApi";
 import { useState, useEffect } from "react";
 
 export function useWeather() {
-  const [location, setLocation] = useState({ latitude: 52.6309, longitude: 1.2974 }); // Norwich default
+  const [location, setLocation] = useState({ 
+    latitude: 52.6309, 
+    longitude: 1.2974, 
+    name: "Norwich, UK" 
+  });
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -12,6 +16,7 @@ export function useWeather() {
           setLocation({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
+            name: "Your Location",
           });
         },
         (error) => {
@@ -24,8 +29,8 @@ export function useWeather() {
   const { data, isLoading, error } = useQuery<WeatherData>({
     queryKey: ["weather", location.latitude, location.longitude],
     queryFn: () => fetchWeatherData(location.latitude, location.longitude),
-    refetchInterval: 600000, // Refetch every 10 minutes
+    refetchInterval: 30000, // Refetch every 30 seconds
   });
 
-  return { data, isLoading, error, location };
+  return { data, isLoading, error, location, setLocation };
 }

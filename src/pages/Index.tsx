@@ -2,11 +2,18 @@ import CurrentWeather from "@/components/CurrentWeather";
 import HourlyForecast from "@/components/HourlyForecast";
 import WeeklyForecast from "@/components/WeeklyForecast";
 import WeatherDetails from "@/components/WeatherDetails";
+import { LocationSearch } from "@/components/LocationSearch";
 import { useWeather } from "@/hooks/useWeather";
+import { useTemperatureUnit } from "@/contexts/TemperatureUnitContext";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
 import { MapPin, Loader2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const Index = () => {
-  const { data, isLoading, error } = useWeather();
+  const { data, isLoading, error, location, setLocation } = useWeather();
+  const { unit, toggleUnit } = useTemperatureUnit();
 
   if (isLoading) {
     return (
@@ -31,33 +38,60 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-primary" />
-            <h1 className="text-2xl font-semibold">Your Location</h1>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Last updated: {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-          </p>
-        </div>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full">
+        <AppSidebar />
+        <div className="flex-1 flex flex-col">
+          <header className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-border bg-card/50 backdrop-blur-sm">
+            <div className="flex items-center gap-4">
+              <SidebarTrigger />
+              <div className="flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-primary" />
+                <h1 className="text-xl font-semibold">{location.name}</h1>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="temp-unit" className="text-sm">°C</Label>
+                <Switch 
+                  id="temp-unit" 
+                  checked={unit === "F"} 
+                  onCheckedChange={toggleUnit}
+                />
+                <Label htmlFor="temp-unit" className="text-sm">°F</Label>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+              </p>
+            </div>
+          </header>
 
-        <CurrentWeather data={data} />
-        
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Weekly Forecast</h2>
-          <WeeklyForecast data={data} />
-        </div>
+          <main className="flex-1 overflow-auto">
+            <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+              <LocationSearch 
+                onLocationSelect={(lat, lon, name) => 
+                  setLocation({ latitude: lat, longitude: lon, name })
+                }
+              />
 
-        <HourlyForecast data={data} />
+              <CurrentWeather data={data} />
+              
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Weekly Forecast</h2>
+                <WeeklyForecast data={data} />
+              </div>
 
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Weather Details</h2>
-          <WeatherDetails data={data} />
+              <HourlyForecast data={data} />
+
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Weather Details</h2>
+                <WeatherDetails data={data} />
+              </div>
+            </div>
+          </main>
         </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 

@@ -1,12 +1,14 @@
 import { Cloud, Sun, CloudRain, CloudSun, Wind, Droplets, Eye, Gauge, Thermometer, Sunrise, Sunset } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { WeatherData, getWeatherDescription, getWeatherIcon } from "@/lib/weatherApi";
+import { useTemperatureUnit } from "@/contexts/TemperatureUnitContext";
 
 interface CurrentWeatherProps {
   data: WeatherData;
 }
 
 const CurrentWeather = ({ data }: CurrentWeatherProps) => {
+  const { unit, convertTemp } = useTemperatureUnit();
   const iconType = getWeatherIcon(data.current.weatherCode);
   const WeatherIcon = iconType === 'sun' ? Sun : iconType === 'cloudRain' ? CloudRain : iconType === 'cloudSun' ? CloudSun : Cloud;
   const iconColor = iconType === 'sun' ? 'text-warning' : iconType === 'cloudRain' ? 'text-primary' : 'text-foreground';
@@ -24,11 +26,11 @@ const CurrentWeather = ({ data }: CurrentWeatherProps) => {
               <p className="text-xs text-muted-foreground mb-4">{new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</p>
               <div className="flex items-center gap-4 mb-4">
                 <WeatherIcon className={`w-16 h-16 ${iconColor}`} />
-                <div className="text-6xl font-light">{data.current.temperature}°C</div>
+                <div className="text-6xl font-light">{convertTemp(data.current.temperature)}°{unit}</div>
               </div>
               <p className="text-xl font-medium mb-2">{description}</p>
               <p className="text-sm text-muted-foreground flex items-center gap-1">
-                Feels like <span className="text-foreground">{data.current.feelsLike}°</span>
+                Feels like <span className="text-foreground">{convertTemp(data.current.feelsLike)}°{unit}</span>
               </p>
               <p className="text-sm text-muted-foreground mt-4">
                 Cloud cover at {data.current.cloudCover}%. Wind speed {data.current.windSpeed} km/h.
@@ -99,7 +101,7 @@ const CurrentWeather = ({ data }: CurrentWeatherProps) => {
               <Thermometer className="w-4 h-4" />
               Dew point
             </div>
-            <div className="text-3xl font-semibold">{data.current.dewPoint}°</div>
+            <div className="text-3xl font-semibold">{convertTemp(data.current.dewPoint)}°{unit}</div>
           </Card>
         </div>
       </div>

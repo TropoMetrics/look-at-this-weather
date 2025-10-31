@@ -1,12 +1,15 @@
 import { Card } from "@/components/ui/card";
 import { Wind, Droplets, Eye, Gauge, Moon, Sun } from "lucide-react";
 import { WeatherData } from "@/lib/weatherApi";
+import { useTemperatureUnit } from "@/contexts/TemperatureUnitContext";
 
 interface WeatherDetailsProps {
   data: WeatherData;
 }
 
 const WeatherDetails = ({ data }: WeatherDetailsProps) => {
+  const { unit, convertTemp } = useTemperatureUnit();
+  
   const getUVLevel = (uv: number) => {
     if (uv < 3) return { level: "Low", color: "text-success" };
     if (uv < 6) return { level: "Moderate", color: "text-warning" };
@@ -28,7 +31,7 @@ const WeatherDetails = ({ data }: WeatherDetailsProps) => {
               style={{ left: `${(data.current.temperature + 10) * 2}%` }}
             />
           </div>
-          <div className="text-4xl font-light">{data.current.temperature}°</div>
+          <div className="text-4xl font-light">{convertTemp(data.current.temperature)}°{unit}</div>
           <p className="text-xs text-muted-foreground">Current temperature</p>
         </div>
       </Card>
@@ -44,7 +47,7 @@ const WeatherDetails = ({ data }: WeatherDetailsProps) => {
               style={{ left: `${(data.current.feelsLike + 10) * 2}%` }}
             />
           </div>
-          <div className="text-4xl font-light">{data.current.feelsLike}°</div>
+          <div className="text-4xl font-light">{convertTemp(data.current.feelsLike)}°{unit}</div>
           <p className="text-xs text-muted-foreground">Apparent temperature</p>
         </div>
       </Card>
@@ -101,7 +104,7 @@ const WeatherDetails = ({ data }: WeatherDetailsProps) => {
           <div className="text-4xl font-light">{data.current.humidity}%</div>
           <div className="text-sm">
             <span className="text-muted-foreground">Dew point: </span>
-            <span className="text-foreground">{data.current.dewPoint}°</span>
+            <span className="text-foreground">{convertTemp(data.current.dewPoint)}°{unit}</span>
           </div>
         </div>
       </Card>

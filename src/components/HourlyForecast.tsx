@@ -2,17 +2,19 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Cloud, CloudRain, CloudSun, Sun, Wind as WindIcon } from "lucide-react";
 import { WeatherData, getWeatherIcon } from "@/lib/weatherApi";
+import { useTemperatureUnit } from "@/contexts/TemperatureUnitContext";
 
 interface HourlyForecastProps {
   data: WeatherData;
 }
 
 const HourlyForecast = ({ data }: HourlyForecastProps) => {
+  const { unit, convertTemp } = useTemperatureUnit();
+  
   const hours = data.hourly.map((hour) => {
     const iconType = getWeatherIcon(hour.weatherCode);
     return {
       time: hour.time,
-      temp: `${hour.temperature}°`,
       temperature: hour.temperature,
       icon: iconType === 'sun' ? Sun : iconType === 'cloudRain' ? CloudRain : iconType === 'cloudSun' ? CloudSun : Cloud,
       iconColor: iconType === 'sun' ? 'text-warning' : iconType === 'cloudRain' ? 'text-primary' : 'text-foreground',
@@ -61,7 +63,7 @@ const HourlyForecast = ({ data }: HourlyForecastProps) => {
                   >
                     <span className="text-sm text-muted-foreground">{hour.time}</span>
                     <IconComponent className={`w-8 h-8 ${hour.iconColor}`} />
-                    <span className="text-sm font-medium">{hour.temp}</span>
+                    <span className="text-sm font-medium">{convertTemp(hour.temperature)}°{unit}</span>
                   </div>
                 );
               })}
@@ -136,7 +138,7 @@ const HourlyForecast = ({ data }: HourlyForecastProps) => {
             <div className="absolute inset-0 flex justify-between items-end pointer-events-none px-2">
               {hours.filter((_, i) => i % 2 === 0).map((hour, i) => (
                 <div key={i} className="text-xs text-muted-foreground">
-                  {hour.temp}
+                  {convertTemp(hour.temperature)}°{unit}
                 </div>
               ))}
             </div>

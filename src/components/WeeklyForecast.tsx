@@ -1,12 +1,15 @@
 import { Card } from "@/components/ui/card";
 import { Cloud, CloudRain, CloudSun, Sun } from "lucide-react";
 import { WeatherData, getWeatherIcon } from "@/lib/weatherApi";
+import { useTemperatureUnit } from "@/contexts/TemperatureUnitContext";
 
 interface WeeklyForecastProps {
   data: WeatherData;
 }
 
 const WeeklyForecast = ({ data }: WeeklyForecastProps) => {
+  const { unit, convertTemp } = useTemperatureUnit();
+  
   const days = data.daily.map((day, index) => {
     const date = new Date(day.date);
     const iconType = getWeatherIcon(day.weatherCode);
@@ -15,8 +18,8 @@ const WeeklyForecast = ({ data }: WeeklyForecastProps) => {
       day: index === 0 ? "Today" : date.toLocaleDateString('en-US', { weekday: 'short' }),
       icon: iconType === 'sun' ? Sun : iconType === 'cloudRain' ? CloudRain : iconType === 'cloudSun' ? CloudSun : Cloud,
       iconColor: iconType === 'sun' ? 'text-warning' : iconType === 'cloudRain' ? 'text-primary' : 'text-foreground',
-      high: `${day.temperatureMax}°`,
-      low: `${day.temperatureMin}°`,
+      high: day.temperatureMax,
+      low: day.temperatureMin,
     };
   });
 
@@ -36,8 +39,8 @@ const WeeklyForecast = ({ data }: WeeklyForecastProps) => {
               </div>
               <IconComponent className={`w-12 h-12 ${day.iconColor}`} />
               <div className="flex gap-2 text-sm">
-                <span className="font-medium">{day.high}</span>
-                <span className="text-muted-foreground">{day.low}</span>
+                <span className="font-medium">{convertTemp(day.high)}°{unit}</span>
+                <span className="text-muted-foreground">{convertTemp(day.low)}°{unit}</span>
               </div>
             </div>
           </Card>
