@@ -30,6 +30,8 @@ export function useWeather() {
     queryKey: ["weather", location.latitude, location.longitude],
     queryFn: () => fetchWeatherData(location.latitude, location.longitude),
     refetchInterval: 30000, // Refetch every 30 seconds
+    retry: 2,
+    staleTime: 0,
   });
 
   return { data, isLoading, error, location, setLocation };

@@ -29,10 +29,17 @@ export function LocationSearch({ onLocationSelect }: LocationSearchProps) {
       const response = await fetch(
         `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=en&format=json`
       );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch location data');
+      }
+      
       const data = await response.json();
+      console.log("Location search results:", data);
       setResults(data.results || []);
     } catch (error) {
       console.error("Error searching location:", error);
+      setResults([]);
     } finally {
       setIsSearching(false);
     }
@@ -59,6 +66,7 @@ export function LocationSearch({ onLocationSelect }: LocationSearchProps) {
             <button
               key={index}
               onClick={() => {
+                console.log("Selected location:", result);
                 onLocationSelect(result.lat, result.lon, `${result.name}, ${result.country}`);
                 setResults([]);
                 setQuery("");
