@@ -10,9 +10,10 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { MapPin, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
-  const { data, isLoading, error, location, setLocation } = useWeather();
+  const { data, isLoading, error, location, setLocation, getUserLocation } = useWeather();
   const { unit, toggleUnit } = useTemperatureUnit();
 
   if (isLoading) {
@@ -46,7 +47,14 @@ const Index = () => {
             <div className="flex items-center gap-4">
               <SidebarTrigger />
               <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-primary" />
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={getUserLocation}
+                  title="Use my location"
+                >
+                  <MapPin className="w-5 h-5 text-primary" />
+                </Button>
                 <h1 className="text-xl font-semibold">{location.name}</h1>
               </div>
             </div>

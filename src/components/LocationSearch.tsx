@@ -11,8 +11,8 @@ interface LocationSearchProps {
 interface SearchResult {
   name: string;
   country: string;
-  lat: number;
-  lon: number;
+  latitude: number;
+  longitude: number;
   state?: string;
 }
 
@@ -67,7 +67,7 @@ export function LocationSearch({ onLocationSelect }: LocationSearchProps) {
               key={index}
               onClick={() => {
                 console.log("Selected location:", result);
-                onLocationSelect(result.lat, result.lon, `${result.name}, ${result.country}`);
+                onLocationSelect(result.latitude, result.longitude, `${result.name}, ${result.country}`);
                 setResults([]);
                 setQuery("");
               }}

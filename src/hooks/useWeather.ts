@@ -9,7 +9,7 @@ export function useWeather() {
     name: "Norwich, UK" 
   });
 
-  useEffect(() => {
+  const getUserLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -20,11 +20,11 @@ export function useWeather() {
           });
         },
         (error) => {
-          console.log("Using default location (Norwich):", error);
+          console.log("Geolocation error:", error);
         }
       );
     }
-  }, []);
+  };
 
   const { data, isLoading, error } = useQuery<WeatherData>({
     queryKey: ["weather", location.latitude, location.longitude],
@@ -34,5 +34,5 @@ export function useWeather() {
     staleTime: 0,
   });
 
-  return { data, isLoading, error, location, setLocation };
+  return { data, isLoading, error, location, setLocation, getUserLocation };
 }
