@@ -26,7 +26,7 @@ export function useWeather() {
     }
   };
 
-  const { data, isLoading, error } = useQuery<WeatherData>({
+  const { data, isLoading, error, refetch } = useQuery<WeatherData>({
     queryKey: ["weather", location.latitude, location.longitude],
     queryFn: () => fetchWeatherData(location.latitude, location.longitude),
     refetchInterval: 30000, // Refetch every 30 seconds
@@ -34,5 +34,5 @@ export function useWeather() {
     staleTime: 0,
   });
 
-  return { data, isLoading, error, location, setLocation, getUserLocation };
+  return { data, isLoading, error, location, setLocation, getUserLocation, refetch };
 }

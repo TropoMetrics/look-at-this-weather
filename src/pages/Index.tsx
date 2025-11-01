@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
-  const { data, isLoading, error, location, setLocation, getUserLocation } = useWeather();
+  const { data, isLoading, error, location, setLocation, getUserLocation, refetch } = useWeather();
   const { unit, toggleUnit } = useTemperatureUnit();
 
   if (isLoading) {
@@ -50,7 +50,10 @@ const Index = () => {
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  onClick={getUserLocation}
+                  onClick={() => {
+                    getUserLocation();
+                    setTimeout(() => refetch(), 100);
+                  }}
                   title="Use my location"
                 >
                   <MapPin className="w-5 h-5 text-primary" />
@@ -77,9 +80,10 @@ const Index = () => {
           <main className="flex-1 overflow-auto">
             <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
               <LocationSearch 
-                onLocationSelect={(lat, lon, name) => 
-                  setLocation({ latitude: lat, longitude: lon, name })
-                }
+                onLocationSelect={(lat, lon, name) => {
+                  setLocation({ latitude: lat, longitude: lon, name });
+                  setTimeout(() => refetch(), 100);
+                }}
               />
 
               <CurrentWeather data={data} />
