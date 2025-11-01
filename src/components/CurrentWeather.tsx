@@ -1,4 +1,4 @@
-import { Cloud, Sun, CloudRain, CloudSun, Wind, Droplets, Eye, Gauge, Thermometer, Sunrise, Sunset } from "lucide-react";
+import { Cloud, Sun, CloudRain, CloudSun, Wind, Droplets, Eye, Gauge, Thermometer, Sunrise, Sunset, Moon, CloudMoon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { WeatherData, getWeatherDescription, getWeatherIcon } from "@/lib/weatherApi";
 import { useTemperatureUnit } from "@/contexts/TemperatureUnitContext";
@@ -9,9 +9,28 @@ interface CurrentWeatherProps {
 
 const CurrentWeather = ({ data }: CurrentWeatherProps) => {
   const { unit, convertTemp } = useTemperatureUnit();
-  const iconType = getWeatherIcon(data.current.weatherCode);
-  const WeatherIcon = iconType === 'sun' ? Sun : iconType === 'cloudRain' ? CloudRain : iconType === 'cloudSun' ? CloudSun : Cloud;
-  const iconColor = iconType === 'sun' ? 'text-warning' : iconType === 'cloudRain' ? 'text-primary' : 'text-foreground';
+  const iconType = getWeatherIcon(data.current.weatherCode, data.currentTime, data.daily[0].sunrise, data.daily[0].sunset);
+  
+  const iconMap = {
+    sun: Sun,
+    moon: Moon,
+    cloudRain: CloudRain,
+    cloudSun: CloudSun,
+    cloudMoon: CloudMoon,
+    cloud: Cloud
+  };
+  
+  const colorMap = {
+    sun: 'text-warning',
+    moon: 'text-blue-300',
+    cloudRain: 'text-primary',
+    cloudSun: 'text-warning',
+    cloudMoon: 'text-blue-300',
+    cloud: 'text-foreground'
+  };
+  
+  const WeatherIcon = iconMap[iconType];
+  const iconColor = colorMap[iconType];
   const description = getWeatherDescription(data.current.weatherCode);
   
   const sunrise = new Date(data.daily[0].sunrise).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });

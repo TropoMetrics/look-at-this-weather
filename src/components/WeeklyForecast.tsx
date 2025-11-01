@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Cloud, CloudRain, CloudSun, Sun } from "lucide-react";
+import { Cloud, CloudRain, CloudSun, Sun, Moon, CloudMoon } from "lucide-react";
 import { WeatherData, getWeatherIcon } from "@/lib/weatherApi";
 import { useTemperatureUnit } from "@/contexts/TemperatureUnitContext";
 
@@ -10,14 +10,34 @@ interface WeeklyForecastProps {
 const WeeklyForecast = ({ data }: WeeklyForecastProps) => {
   const { unit, convertTemp } = useTemperatureUnit();
   
+  const iconMap = {
+    sun: Sun,
+    moon: Moon,
+    cloudRain: CloudRain,
+    cloudSun: CloudSun,
+    cloudMoon: CloudMoon,
+    cloud: Cloud
+  };
+  
+  const colorMap = {
+    sun: 'text-warning',
+    moon: 'text-blue-300',
+    cloudRain: 'text-primary',
+    cloudSun: 'text-warning',
+    cloudMoon: 'text-blue-300',
+    cloud: 'text-foreground'
+  };
+  
   const days = data.daily.map((day, index) => {
     const date = new Date(day.date);
-    const iconType = getWeatherIcon(day.weatherCode);
+    // For daily forecast, use noon as the reference time
+    const noonTime = `${day.date}T12:00:00`;
+    const iconType = getWeatherIcon(day.weatherCode, noonTime, day.sunrise, day.sunset);
     return {
       date: date.getDate().toString(),
       day: index === 0 ? "Today" : date.toLocaleDateString('en-US', { weekday: 'short' }),
-      icon: iconType === 'sun' ? Sun : iconType === 'cloudRain' ? CloudRain : iconType === 'cloudSun' ? CloudSun : Cloud,
-      iconColor: iconType === 'sun' ? 'text-warning' : iconType === 'cloudRain' ? 'text-primary' : 'text-foreground',
+      icon: iconMap[iconType],
+      iconColor: colorMap[iconType],
       high: day.temperatureMax,
       low: day.temperatureMin,
     };

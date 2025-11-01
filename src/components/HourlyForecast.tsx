@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Cloud, CloudRain, CloudSun, Sun, Wind as WindIcon } from "lucide-react";
+import { Cloud, CloudRain, CloudSun, Sun, Wind as WindIcon, Moon, CloudMoon } from "lucide-react";
 import { WeatherData, getWeatherIcon } from "@/lib/weatherApi";
 import { useTemperatureUnit } from "@/contexts/TemperatureUnitContext";
 
@@ -11,13 +11,31 @@ interface HourlyForecastProps {
 const HourlyForecast = ({ data }: HourlyForecastProps) => {
   const { unit, convertTemp } = useTemperatureUnit();
   
+  const iconMap = {
+    sun: Sun,
+    moon: Moon,
+    cloudRain: CloudRain,
+    cloudSun: CloudSun,
+    cloudMoon: CloudMoon,
+    cloud: Cloud
+  };
+  
+  const colorMap = {
+    sun: 'text-warning',
+    moon: 'text-blue-300',
+    cloudRain: 'text-primary',
+    cloudSun: 'text-warning',
+    cloudMoon: 'text-blue-300',
+    cloud: 'text-foreground'
+  };
+  
   const hours = data.hourly.map((hour) => {
-    const iconType = getWeatherIcon(hour.weatherCode);
+    const iconType = getWeatherIcon(hour.weatherCode, hour.timeISO, data.daily[0].sunrise, data.daily[0].sunset);
     return {
       time: hour.time,
       temperature: hour.temperature,
-      icon: iconType === 'sun' ? Sun : iconType === 'cloudRain' ? CloudRain : iconType === 'cloudSun' ? CloudSun : Cloud,
-      iconColor: iconType === 'sun' ? 'text-warning' : iconType === 'cloudRain' ? 'text-primary' : 'text-foreground',
+      icon: iconMap[iconType],
+      iconColor: colorMap[iconType],
       precipitation: hour.precipitation,
       windSpeed: hour.windSpeed,
       windDirection: hour.windDirection,

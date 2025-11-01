@@ -15,6 +15,7 @@ export interface WeatherData {
   };
   hourly: Array<{
     time: string;
+    timeISO: string;
     temperature: number;
     weatherCode: number;
     precipitation: number;
@@ -31,6 +32,7 @@ export interface WeatherData {
     sunrise: string;
     sunset: string;
   }>;
+  currentTime: string;
 }
 
 export async function fetchWeatherData(latitude: number, longitude: number): Promise<WeatherData> {
@@ -71,6 +73,7 @@ export async function fetchWeatherData(latitude: number, longitude: number): Pro
     },
     hourly: data.hourly.time.slice(0, 24).map((time: string, index: number) => ({
       time: new Date(time).toLocaleTimeString('en-US', { hour: 'numeric' }),
+      timeISO: time,
       temperature: Math.round(data.hourly.temperature_2m[index]),
       weatherCode: data.hourly.weather_code[index],
       precipitation: data.hourly.precipitation_probability[index] || 0,
@@ -87,6 +90,7 @@ export async function fetchWeatherData(latitude: number, longitude: number): Pro
       sunrise: data.daily.sunrise[index],
       sunset: data.daily.sunset[index],
     })),
+    currentTime: data.current.time,
   };
 }
 
@@ -120,9 +124,31 @@ export function getWeatherDescription(code: number): string {
   return weatherCodes[code] || 'Unknown';
 }
 
-export function getWeatherIcon(code: number): 'sun' | 'cloud' | 'cloudRain' | 'cloudSun' {
-  if (code === 0 || code === 1) return 'sun';
-  if (code === 2) return 'cloudSun';
-  if (code >= 51 && code <= 99) return 'cloudRain';
+export function getWeatherIcon(code: number, time?: string, sunrise?: string, sunset?: string): 'sun' | 'moon' | 'cloud' | 'cloudRain' | 'cloudSun' | 'cloudMoon' {
+  // Determine if it's nighttime
+  let isNight = false;
+  if (time && sunrise && sunset) {
+    const currentTime = new Date(time).getTime();
+    const sunriseTime = new Date(sunrise).getTime();
+    const sunsetTime = new Date(sunset).getTime();
+    isNight = currentTime < sunriseTime || currentTime > sunsetTime;
+  }
+
+  // Clear sky
+  if (code === 0 || code === 1) {
+    return isNight ? 'moon' : 'sun';
+  }
+  
+  // Partly cloudy
+  if (code === 2) {
+    return isNight ? 'cloudMoon' : 'cloudSun';
+  }
+  
+  // Rain, snow, or thunderstorm
+  if (code >= 51 && code <= 99) {
+    return 'cloudRain';
+  }
+  
+  // Overcast or other conditions
   return 'cloud';
 }
