@@ -16,7 +16,7 @@ const Index = () => {
   const { data, isLoading, error, location, setLocation, getUserLocation, refetch } = useWeather();
   const { unit, toggleUnit } = useTemperatureUnit();
 
-  if (isLoading) {
+  if (isLoading && !data) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -50,9 +50,8 @@ const Index = () => {
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  onClick={() => {
-                    getUserLocation();
-                    setTimeout(() => refetch(), 100);
+                  onClick={async () => {
+                    await getUserLocation();
                   }}
                   title="Use my location"
                 >
@@ -82,7 +81,6 @@ const Index = () => {
               <LocationSearch 
                 onLocationSelect={(lat, lon, name) => {
                   setLocation({ latitude: lat, longitude: lon, name });
-                  setTimeout(() => refetch(), 100);
                 }}
               />
 

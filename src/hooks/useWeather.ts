@@ -10,20 +10,26 @@ export function useWeather() {
   });
 
   const getUserLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            name: "Your Location",
-          });
-        },
-        (error) => {
-          console.log("Geolocation error:", error);
-        }
-      );
-    }
+    return new Promise<void>((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setLocation({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              name: "Your Location",
+            });
+            resolve();
+          },
+          (error) => {
+            console.log("Geolocation error:", error);
+            reject(error);
+          }
+        );
+      } else {
+        reject(new Error("Geolocation not supported"));
+      }
+    });
   };
 
   const { data, isLoading, error, refetch } = useQuery<WeatherData>({
