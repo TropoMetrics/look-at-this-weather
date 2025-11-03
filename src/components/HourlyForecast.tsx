@@ -1,8 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Cloud, CloudRain, CloudSun, Sun, Wind as WindIcon, Moon, CloudMoon } from "lucide-react";
+import { Cloud, Sun, Wind as WindIcon, Moon } from "lucide-react";
 import { WeatherData, getWeatherIcon } from "@/lib/weatherApi";
 import { useTemperatureUnit } from "@/contexts/TemperatureUnitContext";
+import { CloudRainLight, CloudRainMedium, CloudRainHeavy, CloudSunColored, CloudMoonColored } from "@/components/RainIcons";
+import { useState } from "react";
 
 interface HourlyForecastProps {
   data: WeatherData;
@@ -10,22 +12,29 @@ interface HourlyForecastProps {
 
 const HourlyForecast = ({ data }: HourlyForecastProps) => {
   const { unit, convertTemp } = useTemperatureUnit();
+  const [hoveredTemp, setHoveredTemp] = useState<{ index: number; value: number } | null>(null);
+  const [hoveredWind, setHoveredWind] = useState<{ index: number; speed: number; gust: number } | null>(null);
+  const [hoveredHumidity, setHoveredHumidity] = useState<{ index: number; value: number } | null>(null);
   
   const iconMap = {
     sun: Sun,
     moon: Moon,
-    cloudRain: CloudRain,
-    cloudSun: CloudSun,
-    cloudMoon: CloudMoon,
+    cloudRainLight: CloudRainLight,
+    cloudRain: CloudRainMedium,
+    cloudRainHeavy: CloudRainHeavy,
+    cloudSun: CloudSunColored,
+    cloudMoon: CloudMoonColored,
     cloud: Cloud
   };
   
   const colorMap = {
     sun: 'text-warning',
     moon: 'text-blue-300',
+    cloudRainLight: 'text-primary',
     cloudRain: 'text-primary',
-    cloudSun: 'text-warning',
-    cloudMoon: 'text-blue-300',
+    cloudRainHeavy: 'text-primary',
+    cloudSun: '',
+    cloudMoon: '',
     cloud: 'text-foreground'
   };
   
@@ -89,7 +98,21 @@ const HourlyForecast = ({ data }: HourlyForecastProps) => {
           </div>
 
           <div className="mt-6 relative h-40">
-            <svg className="w-full h-full" viewBox="0 0 1200 160" preserveAspectRatio="none">
+            <svg 
+              className="w-full h-full" 
+              viewBox="0 0 1200 160" 
+              preserveAspectRatio="none"
+              onMouseMove={(e) => {
+                const svg = e.currentTarget;
+                const rect = svg.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 1200;
+                const index = Math.round((x / 1200) * (hours.length - 1));
+                if (index >= 0 && index < hours.length) {
+                  setHoveredTemp({ index, value: hours[index].temperature });
+                }
+              }}
+              onMouseLeave={() => setHoveredTemp(null)}
+            >
               {/* Grid lines */}
               {[0, 1, 2, 3, 4].map((i) => (
                 <line
@@ -150,7 +173,46 @@ const HourlyForecast = ({ data }: HourlyForecastProps) => {
                   />
                 );
               })}
+              
+              {/* Hover indicator */}
+              {hoveredTemp && (
+                <>
+                  <line
+                    x1={(hoveredTemp.index / (hours.length - 1)) * 1200}
+                    y1="0"
+                    x2={(hoveredTemp.index / (hours.length - 1)) * 1200}
+                    y2="160"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth="1"
+                    strokeDasharray="4 4"
+                    opacity="0.5"
+                  />
+                  <circle
+                    cx={(hoveredTemp.index / (hours.length - 1)) * 1200}
+                    cy={160 - ((hoveredTemp.value - minTemp) / tempRange) * 120 - 20}
+                    r="6"
+                    fill="hsl(var(--primary))"
+                    stroke="hsl(var(--background))"
+                    strokeWidth="2"
+                  />
+                </>
+              )}
             </svg>
+            
+            {/* Hover tooltip */}
+            {hoveredTemp && (
+              <div 
+                className="absolute bg-popover border border-border rounded-md px-3 py-2 text-sm shadow-lg pointer-events-none z-10"
+                style={{
+                  left: `${(hoveredTemp.index / (hours.length - 1)) * 100}%`,
+                  top: `${((1 - ((hoveredTemp.value - minTemp) / tempRange)) * 100) - 20}%`,
+                  transform: 'translate(-50%, -100%)',
+                }}
+              >
+                <div className="font-medium">{hours[hoveredTemp.index].time}</div>
+                <div className="text-muted-foreground">{convertTemp(hoveredTemp.value)}°{unit}</div>
+              </div>
+            )}
             
             {/* Temperature labels */}
             <div className="absolute inset-0 flex justify-between items-end pointer-events-none px-2">
@@ -194,7 +256,25 @@ const HourlyForecast = ({ data }: HourlyForecastProps) => {
             </div>
 
             <div className="ml-12 h-full">
-              <svg className="w-full h-full" viewBox="0 0 1200 200" preserveAspectRatio="none">
+              <svg 
+                className="w-full h-full" 
+                viewBox="0 0 1200 200" 
+                preserveAspectRatio="none"
+                onMouseMove={(e) => {
+                  const svg = e.currentTarget;
+                  const rect = svg.getBoundingClientRect();
+                  const x = ((e.clientX - rect.left) / rect.width) * 1200;
+                  const index = Math.round((x / 1200) * (hours.length - 1));
+                  if (index >= 0 && index < hours.length) {
+                    setHoveredWind({ 
+                      index, 
+                      speed: hours[index].windSpeed, 
+                      gust: hours[index].windGusts 
+                    });
+                  }
+                }}
+                onMouseLeave={() => setHoveredWind(null)}
+              >
                 {/* Grid lines */}
                 {[0, 1, 2, 3, 4].map((i) => (
                   <line
@@ -263,7 +343,47 @@ const HourlyForecast = ({ data }: HourlyForecastProps) => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
+                
+                {/* Hover indicator */}
+                {hoveredWind && (
+                  <>
+                    <line
+                      x1={(hoveredWind.index / (hours.length - 1)) * 1200}
+                      y1="0"
+                      x2={(hoveredWind.index / (hours.length - 1)) * 1200}
+                      y2="200"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth="1"
+                      strokeDasharray="4 4"
+                      opacity="0.5"
+                    />
+                    <circle
+                      cx={(hoveredWind.index / (hours.length - 1)) * 1200}
+                      cy={200 - ((hoveredWind.speed - minWind) / windRange) * 180}
+                      r="6"
+                      fill="hsl(var(--primary))"
+                      stroke="hsl(var(--background))"
+                      strokeWidth="2"
+                    />
+                  </>
+                )}
               </svg>
+              
+              {/* Hover tooltip */}
+              {hoveredWind && (
+                <div 
+                  className="absolute bg-popover border border-border rounded-md px-3 py-2 text-sm shadow-lg pointer-events-none z-10"
+                  style={{
+                    left: `${(hoveredWind.index / (hours.length - 1)) * 100}%`,
+                    top: `${((1 - ((hoveredWind.speed - minWind) / windRange)) * 100) - 10}%`,
+                    transform: 'translate(-50%, -100%)',
+                  }}
+                >
+                  <div className="font-medium">{hours[hoveredWind.index].time}</div>
+                  <div className="text-muted-foreground">Speed: {Math.round(hoveredWind.speed)} km/h</div>
+                  <div className="text-muted-foreground">Gust: {Math.round(hoveredWind.gust)} km/h</div>
+                </div>
+              )}
             </div>
 
             {/* Legend */}
@@ -292,7 +412,21 @@ const HourlyForecast = ({ data }: HourlyForecastProps) => {
             </div>
 
             <div className="ml-12 h-full">
-              <svg className="w-full h-full" viewBox="0 0 1200 200" preserveAspectRatio="none">
+              <svg 
+                className="w-full h-full" 
+                viewBox="0 0 1200 200" 
+                preserveAspectRatio="none"
+                onMouseMove={(e) => {
+                  const svg = e.currentTarget;
+                  const rect = svg.getBoundingClientRect();
+                  const x = ((e.clientX - rect.left) / rect.width) * 1200;
+                  const index = Math.round((x / 1200) * (hours.length - 1));
+                  if (index >= 0 && index < hours.length) {
+                    setHoveredHumidity({ index, value: hours[index].humidity });
+                  }
+                }}
+                onMouseLeave={() => setHoveredHumidity(null)}
+              >
                 {/* Grid lines */}
                 {[0, 1, 2, 3, 4].map((i) => (
                   <line
@@ -353,7 +487,46 @@ const HourlyForecast = ({ data }: HourlyForecastProps) => {
                     />
                   );
                 })}
+                
+                {/* Hover indicator */}
+                {hoveredHumidity && (
+                  <>
+                    <line
+                      x1={(hoveredHumidity.index / (hours.length - 1)) * 1200}
+                      y1="0"
+                      x2={(hoveredHumidity.index / (hours.length - 1)) * 1200}
+                      y2="200"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth="1"
+                      strokeDasharray="4 4"
+                      opacity="0.5"
+                    />
+                    <circle
+                      cx={(hoveredHumidity.index / (hours.length - 1)) * 1200}
+                      cy={200 - (hoveredHumidity.value / 100) * 180}
+                      r="6"
+                      fill="hsl(var(--primary))"
+                      stroke="hsl(var(--background))"
+                      strokeWidth="2"
+                    />
+                  </>
+                )}
               </svg>
+              
+              {/* Hover tooltip */}
+              {hoveredHumidity && (
+                <div 
+                  className="absolute bg-popover border border-border rounded-md px-3 py-2 text-sm shadow-lg pointer-events-none z-10"
+                  style={{
+                    left: `${(hoveredHumidity.index / (hours.length - 1)) * 100}%`,
+                    top: `${((1 - (hoveredHumidity.value / 100)) * 100) - 10}%`,
+                    transform: 'translate(-50%, -100%)',
+                  }}
+                >
+                  <div className="font-medium">{hours[hoveredHumidity.index].time}</div>
+                  <div className="text-muted-foreground">{hoveredHumidity.value}%</div>
+                </div>
+              )}
             </div>
 
             {/* Humidity value labels */}

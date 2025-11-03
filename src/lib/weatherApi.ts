@@ -124,7 +124,12 @@ export function getWeatherDescription(code: number): string {
   return weatherCodes[code] || 'Unknown';
 }
 
-export function getWeatherIcon(code: number, time?: string, sunrise?: string, sunset?: string): 'sun' | 'moon' | 'cloud' | 'cloudRain' | 'cloudSun' | 'cloudMoon' {
+export function getWeatherIcon(
+  code: number, 
+  time?: string, 
+  sunrise?: string, 
+  sunset?: string
+): 'sun' | 'moon' | 'cloud' | 'cloudRainLight' | 'cloudRain' | 'cloudRainHeavy' | 'cloudSun' | 'cloudMoon' {
   // Determine if it's nighttime
   let isNight = false;
   if (time && sunrise && sunset) {
@@ -135,20 +140,26 @@ export function getWeatherIcon(code: number, time?: string, sunrise?: string, su
   }
 
   // Clear sky
-  if (code === 0 || code === 1) {
-    return isNight ? 'moon' : 'sun';
-  }
+  if (code === 0) return isNight ? 'moon' : 'sun';
+  if (code === 1) return isNight ? 'moon' : 'sun';
   
   // Partly cloudy
-  if (code === 2) {
-    return isNight ? 'cloudMoon' : 'cloudSun';
-  }
+  if (code === 2 || code === 3) return isNight ? 'cloudMoon' : 'cloudSun';
   
-  // Rain, snow, or thunderstorm
-  if (code >= 51 && code <= 99) {
-    return 'cloudRain';
-  }
+  // Rain with different intensities
+  if (code >= 51 && code <= 55) return 'cloudRainLight'; // Drizzle
+  if (code >= 56 && code <= 57) return 'cloudRainLight'; // Freezing drizzle
+  if (code === 61) return 'cloudRainLight'; // Slight rain
+  if (code === 63) return 'cloudRain'; // Moderate rain
+  if (code >= 65 && code <= 67) return 'cloudRainHeavy'; // Heavy rain
+  if (code >= 80 && code <= 81) return 'cloudRain'; // Rain showers
+  if (code === 82) return 'cloudRainHeavy'; // Violent rain showers
+  if (code >= 95 && code <= 99) return 'cloudRainHeavy'; // Thunderstorm
   
-  // Overcast or other conditions
+  // Snow
+  if (code >= 71 && code <= 77) return 'cloudRain';
+  if (code >= 85 && code <= 86) return 'cloudRain';
+  
+  // Fog or other conditions
   return 'cloud';
 }

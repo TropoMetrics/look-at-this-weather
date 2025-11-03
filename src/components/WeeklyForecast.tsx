@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
-import { Cloud, CloudRain, CloudSun, Sun, Moon, CloudMoon } from "lucide-react";
+import { Cloud, Sun, Moon } from "lucide-react";
+import { CloudRainLight, CloudRainMedium, CloudRainHeavy, CloudSunColored, CloudMoonColored } from "@/components/RainIcons";
 import { WeatherData, getWeatherIcon } from "@/lib/weatherApi";
 import { useTemperatureUnit } from "@/contexts/TemperatureUnitContext";
 
@@ -13,18 +14,22 @@ const WeeklyForecast = ({ data }: WeeklyForecastProps) => {
   const iconMap = {
     sun: Sun,
     moon: Moon,
-    cloudRain: CloudRain,
-    cloudSun: CloudSun,
-    cloudMoon: CloudMoon,
+    cloudRainLight: CloudRainLight,
+    cloudRain: CloudRainMedium,
+    cloudRainHeavy: CloudRainHeavy,
+    cloudSun: CloudSunColored,
+    cloudMoon: CloudMoonColored,
     cloud: Cloud
   };
-  
+
   const colorMap = {
     sun: 'text-warning',
     moon: 'text-blue-300',
+    cloudRainLight: 'text-primary',
     cloudRain: 'text-primary',
-    cloudSun: 'text-warning',
-    cloudMoon: 'text-blue-300',
+    cloudRainHeavy: 'text-primary',
+    cloudSun: '',
+    cloudMoon: '',
     cloud: 'text-foreground'
   };
   
