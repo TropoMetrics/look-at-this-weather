@@ -55,10 +55,15 @@ export function useWeather() {
 
   // Request location on mount
   useEffect(() => {
-    getUserLocation().catch(() => {
-      // Silently fail and keep default location
-      console.log("Using default location");
-    });
+    getUserLocation()
+      .then(() => {
+        // Immediately fetch weather for the new location
+        refetch();
+      })
+      .catch(() => {
+        // Silently fail and keep default location
+        console.log("Using default location");
+      });
   }, []);
 
   const { data, isLoading, error, refetch } = useQuery<WeatherData>({
