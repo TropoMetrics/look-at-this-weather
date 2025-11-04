@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 
 export function useWeather() {
   const [location, setLocation] = useState({ 
-    latitude: 52.6309, 
-    longitude: 1.2974, 
-    name: "Norwich, UK" 
+    latitude: 52.3676, 
+    longitude: 4.9041, 
+    name: "Amsterdam, Netherlands" 
   });
 
   const getUserLocation = async () => {
@@ -17,33 +17,30 @@ export function useWeather() {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
             
-            // Reverse geocode to get location name
             try {
+              // Use Nominatim for reverse geocoding
               const response = await fetch(
-                `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&count=1`
+                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
               );
+              if (!response.ok) {
+                throw new Error('Failed to fetch location data');
+              }
               const data = await response.json();
-              const locationName = data.results?.[0]
-                ? `${data.results[0].name}${data.results[0].admin1 ? ', ' + data.results[0].admin1 : ''}${data.results[0].country ? ', ' + data.results[0].country : ''}`
-                : "Your Location";
+              const locationName = data.display_name.split(',').slice(0, 3).join(',');
               
               setLocation({
                 latitude: lat,
                 longitude: lon,
                 name: locationName,
               });
+              resolve();
             } catch (error) {
-              console.log("Reverse geocoding error:", error);
-              setLocation({
-                latitude: lat,
-                longitude: lon,
-                name: "Your Location",
-              });
+              console.error("Reverse geocoding error:", error);
+              reject(error);
             }
-            resolve();
           },
           (error) => {
-            console.log("Geolocation error:", error);
+            console.error("Geolocation error:", error);
             reject(error);
           }
         );
