@@ -53,26 +53,31 @@ export function useWeather() {
     });
   };
 
+  // Define the query FIRST so refetch is available
+  const { data, isLoading, error, refetch } = useQuery<WeatherData>({
+    queryKey: ["weather", location.latitude, location.longitude],
+    queryFn: () => {
+      console.log("Fetching weather for:", location.latitude, location.longitude);
+      return fetchWeatherData(location.latitude, location.longitude);
+    },
+    refetchInterval: 30000, // Refetch every 30 seconds
+    retry: 2,
+    staleTime: 0,
+  });
+
   // Request location on mount
   useEffect(() => {
     getUserLocation()
       .then(() => {
-        // Immediately fetch weather for the new location
-        refetch();
+        console.log("Location obtained, triggering refetch");
+        // Give React a moment to update the queryKey
+        setTimeout(() => refetch(), 100);
       })
       .catch(() => {
         // Silently fail and keep default location
         console.log("Using default location");
       });
   }, []);
-
-  const { data, isLoading, error, refetch } = useQuery<WeatherData>({
-    queryKey: ["weather", location.latitude, location.longitude],
-    queryFn: () => fetchWeatherData(location.latitude, location.longitude),
-    refetchInterval: 30000, // Refetch every 30 seconds
-    retry: 2,
-    staleTime: 0,
-  });
 
   return { data, isLoading, error, location, setLocation, getUserLocation, refetch };
 }
