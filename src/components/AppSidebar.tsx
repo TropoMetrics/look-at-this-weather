@@ -1,4 +1,4 @@
-import { Cloud, MapPin, Settings, Home } from "lucide-react";
+import { Cloud, AlertTriangle, Map, Waves } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -16,9 +16,10 @@ const items = [
   { title: "Weather", url: "/", icon: Cloud },
 ];
 
-const experimentalItems = [
-  { title: "Locations", url: "#", icon: MapPin },
-  { title: "Settings", url: "#", icon: Settings },
+const maritimeItems = [
+  { title: "Active Weather Warnings", url: "/warnings", icon: AlertTriangle },
+  { title: "Current Weather Map", url: "/weather-map", icon: Map },
+  { title: "6-Hour Forecast", url: "/forecast", icon: Waves },
 ];
 
 export function AppSidebar() {
@@ -46,16 +47,16 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Experimental</SidebarGroupLabel>
+          <SidebarGroupLabel>Maritime Weather Service</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {experimentalItems.map((item) => (
+              {maritimeItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <NavLink to={item.url}>
                       <item.icon className="h-4 w-4" />
                       {open && <span>{item.title}</span>}
-                    </a>
+                    </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
