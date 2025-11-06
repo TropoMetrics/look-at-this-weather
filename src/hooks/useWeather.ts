@@ -57,9 +57,9 @@ export function useWeather() {
       console.log("Fetching weather for:", location.latitude, location.longitude);
       return fetchWeatherData(location.latitude, location.longitude);
     },
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
     retry: 2,
-    staleTime: 0,
+    staleTime: 4 * 60 * 1000, // Data stays fresh for 4 minutes
   });
 
   // Request location on mount
