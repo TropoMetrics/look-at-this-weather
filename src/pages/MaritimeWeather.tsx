@@ -1,12 +1,83 @@
 import { useWeather } from "@/hooks/useWeather";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Wind, Waves, AlertTriangle, Map } from "lucide-react";
+import { Loader2, Wind, Waves, AlertTriangle, Map, Bell } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { useEffect, useRef, useState } from "react";
 
 export default function MaritimeWeather() {
   const { location, data, isLoading } = useWeather();
+  const { toast } = useToast();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const previousWeatherRef = useRef<string | null>(null);
+
+  // Request notification permission
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission().then((permission) => {
+        setNotificationsEnabled(permission === "granted");
+      });
+    } else if ("Notification" in window && Notification.permission === "granted") {
+      setNotificationsEnabled(true);
+    }
+  }, []);
+
+  // Check for bad weather conditions
+  useEffect(() => {
+    if (!data || !notificationsEnabled) return;
+
+    const currentHour = data.hourly[0];
+    if (!currentHour) return;
+
+    const windSpeed = currentHour.windSpeed;
+    const isBadWeather = windSpeed > 50; // Wind speed > 50 km/h considered dangerous
+
+    const weatherKey = `${windSpeed}-${currentHour.timeISO}`;
+    
+    // Only alert if conditions changed and are bad
+    if (isBadWeather && previousWeatherRef.current !== weatherKey) {
+      previousWeatherRef.current = weatherKey;
+      
+      // Show browser notification
+      new Notification("⚠️ Maritime Weather Alert", {
+        body: `Severe weather detected in ${location.name}!\nWind Speed: ${windSpeed} km/h`,
+        icon: "/favicon.ico",
+        tag: "weather-alert",
+      });
+
+      // Show toast as well
+      toast({
+        title: "⚠️ Weather Alert",
+        description: `Severe weather detected! Wind speed: ${windSpeed} km/h`,
+        variant: "destructive",
+      });
+    }
+  }, [data, notificationsEnabled, location.name, toast]);
+
+  const testAlert = () => {
+    if (!notificationsEnabled) {
+      toast({
+        title: "Notifications Disabled",
+        description: "Please enable browser notifications to receive weather alerts.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    new Notification("🧪 Test Maritime Weather Alert", {
+      body: `This is a test alert for ${location.name}. Severe weather notifications will appear like this.`,
+      icon: "/favicon.ico",
+      tag: "weather-alert-test",
+    });
+
+    toast({
+      title: "🧪 Test Alert Sent",
+      description: "Check your browser for the notification!",
+    });
+  };
 
   if (isLoading) {
     return (
@@ -33,7 +104,18 @@ export default function MaritimeWeather() {
           <header className="sticky top-0 z-10 flex items-center gap-4 p-4 border-b border-border bg-card/50 backdrop-blur-sm">
             <SidebarTrigger />
             <h1 className="text-2xl font-bold">Maritime Weather Service</h1>
-            <p className="text-muted-foreground ml-auto">{location.name}</p>
+            <div className="ml-auto flex items-center gap-3">
+              <p className="text-muted-foreground">{location.name}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={testAlert}
+                className="flex items-center gap-2"
+              >
+                <Bell className="h-4 w-4" />
+                Test Alert
+              </Button>
+            </div>
           </header>
 
           <main className="flex-1 overflow-auto p-6 space-y-6">
