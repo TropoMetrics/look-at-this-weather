@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - api-cached-server
     paths-ignore:
       - '**.md'
       - 'docs/**'
