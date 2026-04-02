@@ -28,7 +28,7 @@ A modern, feature-rich weather application built with React, TypeScript, and Vit
 
 ### 🎨 User Experience
 - **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
-- **Dark/Light Mode**: Beautiful theming with shadcn/ui components
+- **Dark/Light Mode**: Beautiful theming with Tailwind CSS
 - **Collapsible Sidebar**: Clean navigation between weather views
 - **Modern UI**: Built with Radix UI primitives and Tailwind CSS
 - **Fast Performance**: Powered by Vite and React Query for optimal loading
@@ -109,7 +109,6 @@ The application will be available at `http://localhost`
 
 ### UI & Styling
 - **Tailwind CSS** - Utility-first CSS framework
-- **shadcn/ui** - High-quality React components
 - **Radix UI** - Unstyled, accessible component primitives
 - **Lucide React** - Beautiful icon library
 
@@ -134,7 +133,7 @@ The application will be available at `http://localhost`
 look-at-this-weather/
 ├── src/
 │   ├── components/          # React components
-│   │   ├── ui/             # shadcn/ui components
+│   │   ├── ui/             # UI components
 │   │   ├── AppSidebar.tsx  # Navigation sidebar
 │   │   ├── CurrentWeather.tsx
 │   │   ├── HourlyForecast.tsx
