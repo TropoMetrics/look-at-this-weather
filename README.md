@@ -1,14 +1,14 @@
-# 🌤️ Look at This Weather
+# Look at This Weather
 
 A modern, feature-rich weather application built with React, TypeScript, and Vite. Get real-time weather data, hourly and weekly forecasts, and specialized maritime weather information all in one beautiful interface.
 
 ![Weather App Preview](public/website_preview.png)
 
-## ✨ Features
+## Features
 
-### 🌍 General Weather
+### General Weather
 - **Real-time Weather Data**: Current temperature, humidity, wind speed, pressure, and more
-- **Location Services**: 
+- **Location Services**:
   - Automatic geolocation detection
   - Manual location search with autocomplete
   - Support for worldwide locations
@@ -19,21 +19,21 @@ A modern, feature-rich weather application built with React, TypeScript, and Vit
 - **Temperature Units**: Toggle between Celsius and Fahrenheit
 - **Weather Visualizations**: Clear weather icons and intuitive UI components
 
-### ⚓ Maritime Weather
+### Maritime Weather
 - **Specialized Maritime Interface**: Tailored for sailors and maritime activities
 - **Wind Conditions**: Detailed wind speed, direction, and gusts
 - **Weather Alerts**: Real-time browser notifications for severe weather
 - **Wave Information**: Maritime-specific weather parameters
 - **Safety Features**: Warning system for dangerous conditions
 
-### 🎨 User Experience
+### User Experience
 - **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
 - **Dark/Light Mode**: Beautiful theming with Tailwind CSS
 - **Collapsible Sidebar**: Clean navigation between weather views
 - **Modern UI**: Built with Radix UI primitives and Tailwind CSS
 - **Fast Performance**: Powered by Vite and React Query for optimal loading
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -43,20 +43,20 @@ A modern, feature-rich weather application built with React, TypeScript, and Vit
 ### Installation
 
 1. **Clone the repository**
-   ```bash
+```bash
    git clone https://github.com/TropoMetrics/look-at-this-weather.git
    cd look-at-this-weather
    ```
 
 2. **Install dependencies**
-   ```bash
+```bash
    npm install
    # or
    bun install
    ```
 
 3. **Start the development server**
-   ```bash
+```bash
    npm run dev
    # or
    bun run dev
@@ -75,7 +75,7 @@ bun run build
 
 The built files will be in the `dist` directory.
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
 ### Using Docker Hub or GitHub Container Registry
 
@@ -100,7 +100,7 @@ docker run -p 80:80 look-at-this-weather
 
 The application will be available at `http://localhost`
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Frontend Framework
 - **React 18** - Modern React with hooks and concurrent features
@@ -127,7 +127,7 @@ The application will be available at `http://localhost`
 - **PostCSS** - CSS processing
 - **SWC** - Fast TypeScript/JavaScript compiler
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 look-at-this-weather/
@@ -163,7 +163,7 @@ look-at-this-weather/
 └── package.json           # Dependencies
 ```
 
-## 🌐 API Integration
+## API Integration
 
 The application uses the TropoMetrics Weather API, which is Open-Meteo compatible, for fetching weather data:
 
@@ -177,7 +177,7 @@ https://api.tropometrics.tech/v1/forecast
 - Daily forecasts (7 days)
 - Multiple weather variables (temperature, wind, precipitation, etc.)
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -195,7 +195,7 @@ The project uses a custom Tailwind configuration with:
 - Custom animations
 - Typography plugin
 
-## 📱 Browser Support
+## Browser Support
 
 - Chrome/Edge (latest)
 - Firefox (latest)
@@ -206,21 +206,21 @@ The project uses a custom Tailwind configuration with:
 - Geolocation API - for automatic location detection
 - Notifications API - for maritime weather alerts
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Here's how you can help:
 
 1. **Fork the repository**
 2. **Create a feature branch**
-   ```bash
+```bash
    git checkout -b feature/amazing-feature
    ```
 3. **Commit your changes**
-   ```bash
+```bash
    git commit -m 'Add some amazing feature'
    ```
 4. **Push to the branch**
-   ```bash
+```bash
    git push origin feature/amazing-feature
    ```
 5. **Open a Pull Request**
@@ -233,12 +233,12 @@ Contributions are welcome! Here's how you can help:
 - Test your changes across different screen sizes
 - Ensure ESLint passes: `npm run lint`
 
-## 📄 License
+## License
 
 This project is for educational purposes.
 
 ---
 
-**Authors:** Max Blaauw, Arne Jansonius, Kai Diemel & Ole Spiegelenberg  
-**Organization:** HHS (The Hague University of Applied Sciences)  
+**Authors:** Max Blaauw, Arne Jansonius, Kai Diemel & Ole Spiegelenberg
+**Organization:** HHS (The Hague University of Applied Sciences)
 **Domain:** hhs.nl
